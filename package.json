@@ -1,0 +1,19 @@
+{
+  "name": "projeto_typescript",
+  "version": "1.0.0",
+  "description": "Projeto para a disciplina de Back-end com Typescript [24E3_2]",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kleberga/projeto_typescript.git"
+  },
+  "author": "Kleber",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kleberga/projeto_typescript/issues"
+  },
+  "homepage": "https://github.com/kleberga/projeto_typescript#readme"
+}
