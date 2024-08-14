@@ -14,3 +14,5 @@ export class UsuarioModel {
     }
 }
 
+export default UsuarioModel;
+

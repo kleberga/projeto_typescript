@@ -1,3 +1,4 @@
+import { CriarUsuarioDTO } from "./infra/usuarioDTO";
 import UsuarioRepositorio from "./infra/usuarioRepositorio";
 import {Router, Request, Response} from 'express';
 
@@ -40,7 +41,7 @@ class UsuarioController {
     }
 
     criarUsuario (req: Request, res: Response) {
-        const usuario = req.body;
+        const usuario: CriarUsuarioDTO = req.body;
         try {
             this.usuarioRepositorio.criarUsuario(usuario);
             return res.json("Usuário inserido com sucesso!")

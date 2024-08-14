@@ -15,6 +15,5 @@ export class CriarUsuarioDTO {
     set ativo (ativo: boolean){
         this.ativo = ativo;
     }
-
 }
 

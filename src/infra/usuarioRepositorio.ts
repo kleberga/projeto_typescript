@@ -2,6 +2,8 @@ import path from "path";
 import fs from 'fs';
 import DBSchema from "./dbSchema";
 import UsuarioSchema from "./usuarioSchema";
+import { CriarUsuarioDTO } from "./usuarioDTO";
+import UsuarioModel from "../entidades/usuarios";
 
 class UsuarioRepositorio {
     caminhoArquivo: string;
@@ -35,9 +37,17 @@ class UsuarioRepositorio {
         }
     }
 
-    criarUsuario (usuario: UsuarioSchema) {
+    criarUsuario (usuario: CriarUsuarioDTO) {
         const bd = this.acessoDB();
-        bd.users.push(usuario);
+        const maiorId = bd.users.reduce(
+            (max, usuario) => usuario.id > max.id ? usuario : max, bd.users[0]
+        );
+        const novoUsuario = new UsuarioModel(
+            maiorId.id + 1,
+            usuario.nome,
+            usuario.ativo
+        );
+        bd.users.push(novoUsuario);
         this.reescreverArquivo(bd);
     }
 
