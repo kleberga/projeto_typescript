@@ -1,7 +1,7 @@
-import UsuarioSchema from "./usuarioSchema";
+import CursoSchema from "./cursoSchema";
 
 interface DBSchema{
-    users: UsuarioSchema[];
+    cursos: CursoSchema[];
 }
 
 export default DBSchema;

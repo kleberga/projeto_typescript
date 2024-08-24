@@ -6,6 +6,7 @@
     "extends": [
         "standard"
     ],
+    "include": ["./src/**/*.ts", "./src/**/*.js", "src/**/__tests__/**/*.ts"],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": 15,

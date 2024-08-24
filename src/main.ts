@@ -1,33 +1,24 @@
-/* import {buscaUsuarios} from "./dominio/usuarioServico";
-
-const usuario = buscaUsuarios();
-console.log("teste: ", usuario); */
-
 import express from 'express';
-import routes from './infra/routes';
+import routes from './routes';
+import Logger from './logger';
+import AuthService from './auth-service';
+import ErrorHandler from './error-handler';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerConfig from './infra/swagger-options';
+import swaggerUI from 'swagger-ui-express';
 
 const app = express();
 const port = 3000;
-
+const swaggerOptions = swaggerJSDoc(swaggerConfig);
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerOptions));
 // utilizar json para receber e passar os dados
 app.use(express.json());
-
+// middleware para capturar o log das requisicoes
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use(Logger.init());
+app.use(AuthService.protect());
 app.use('/api', routes);
-
-/* app.get('/', (req: Request, res: Response) => {
-    res.send("Bem vindo. Esta é a sua primeira API");
-})
-
-app.get('/usuarios', (req: Request, res: Response) => {
-    const usuarios = buscaUsuarios();
-    res.send(JSON.stringify(usuarios));
-})
-
-app.get('/usuarios/:id', (req: Request, res: Response) => {
-    const id = req.params.id;
-    const usuarios = buscaUsuarioPorId(+id);
-    res.send(JSON.stringify(usuarios));
-}) */
+app.use(ErrorHandler.init());
 
 app.listen(port, () => {
     console.log(`Servidor rodando na porta: http://localhost:${port}`);
