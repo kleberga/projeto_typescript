@@ -38,7 +38,7 @@ describe('CursoService', () => {
 
     it("Deve retornar um erro se o curso não for encontrado", () => {
         cursoRepositorio.buscaCursosPorId.mockReturnValue(undefined);
-        expect(() => cursoService.buscarId(999)).toThrow('Usuário não encontrado');
+        expect(() => cursoService.buscarId(999)).toThrow('Curso não encontrado');
         expect(cursoRepositorio.buscaCursosPorId).toHaveBeenNthCalledWith(999);
     })
 })

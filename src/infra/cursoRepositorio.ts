@@ -23,7 +23,7 @@ class CursoRepositorio {
     }
 
     /**
-     * Este método busca um usuário pelo id.
+     * Este método busca um curso pelo id.
      * @param id 
      * @returns {CursoSchema}
      * @example {id: 1, nome: "Ciência da Computação", ...}
