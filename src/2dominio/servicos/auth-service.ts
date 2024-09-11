@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import UnauthorizedException from "./exceptions/unauthorized-exception";
+import UnauthorizedException from "../exceptions/unauthorized-exception";
 
 class AuthService {
 

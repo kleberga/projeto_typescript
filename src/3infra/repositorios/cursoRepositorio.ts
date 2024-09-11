@@ -1,11 +1,15 @@
 import path from "path";
 import fs from 'fs';
-import DBSchema from "./dbSchema";
-import CursoSchema from "./cursoSchema";
-import { AtualizarCursoDTO, CriarCursoDTO } from "../cursoDTO";
-import CursoModel from "../entidades/cursos";
+import DBSchema from "../dbSchema";
+import CursoSchema from "../cursoSchema";
+import { AtualizarCursoDTO, CriarCursoDTO } from "../../2dominio/dtos/cursoDTO";
+import CursoModel from "../../1entidades/cursos";
+import { injectable } from "inversify";
+import 'reflect-metadata';
+import CursoRepositorioInterface from "../../2dominio/interfaces/repositorios/curso-interface-repository";
 
-class CursoRepositorio {
+@injectable()
+class CursoRepositorio implements CursoRepositorioInterface{
     caminhoArquivo: string;
 
     constructor(){

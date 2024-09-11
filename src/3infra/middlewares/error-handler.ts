@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import CustomError from "./exceptions/custom-error";
+import CustomError from "../../2dominio/exceptions/custom-error";
 
 class ErrorHandler {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

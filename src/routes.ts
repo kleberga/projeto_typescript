@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import CursoRepositorio from './infra/cursoRepositorio';
-import CursoController from './cursoController';
+import container from './3infra/inversify-config';
+import CursoController from './4api/controllers/cursoController';
 
 const routes = Router();
 
-const cursoRepositorio = new CursoRepositorio();
-const cursoController = new CursoController(cursoRepositorio);
+const cursoController = container.get<CursoController>('CursoController');
 
 routes.use('/cursos', cursoController.router);
 

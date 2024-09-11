@@ -1,11 +1,11 @@
 import express from 'express';
 import routes from './routes';
-import Logger from './logger';
-import AuthService from './auth-service';
-import ErrorHandler from './error-handler';
+import AuthService from './2dominio/servicos/auth-service';
+import ErrorHandler from './3infra/middlewares/error-handler';
 import swaggerJSDoc from 'swagger-jsdoc';
-import swaggerConfig from './infra/swagger-options';
 import swaggerUI from 'swagger-ui-express';
+import Logger from './3infra/middlewares/logger';
+import swaggerConfig from './3infra/swagger-options';
 
 const app = express();
 const port = 3000;

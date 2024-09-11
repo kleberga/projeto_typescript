@@ -1,22 +1,24 @@
 import { body, validationResult, param } from "express-validator";
-import { CriarCursoDTO } from "./cursoDTO";
-import CursoRepositorio from "./infra/cursoRepositorio";
+import { CriarCursoDTO } from "../../2dominio/dtos/cursoDTO";
 import {Router, Request, Response} from 'express';
-import NotFoundException from "./exceptions/not-found-exception";
-import InternalErrorException from "./exceptions/internal-error-exception";
+import NotFoundException from "../../2dominio/exceptions/not-found-exception";
+import InternalErrorException from "../../2dominio/exceptions/internal-error-exception";
+import { inject, injectable } from "inversify";
+import CursoRepositorioInterface from "../../2dominio/interfaces/repositorios/curso-interface-repository";
 
+@injectable()
 class CursoController {
 
-    private readonly cursoRepositorio: CursoRepositorio;
+    private readonly cursoRepositorio: CursoRepositorioInterface;
     public readonly router: Router = Router();
 
-    constructor (cursoRepositorio: CursoRepositorio){
+    constructor (@inject('CursoRepositorio') cursoRepositorio: CursoRepositorioInterface){
         this.cursoRepositorio = cursoRepositorio;
         this.routes();
     }
 
     routes () {
-        this.router.get('/', this.buscarTodos.bind(this));
+        this.router.get('/', this.buscaCursos.bind(this));
         this.router.get('/:id',
             [
                 param('id').isNumeric().withMessage("O campo id deve ser um número")
@@ -87,7 +89,7 @@ class CursoController {
      *       510:
      *         description: Erro ao recuperar os cursos! Tente novamente.
      */
-    buscarTodos (req: Request, res: Response) {
+    buscaCursos (req: Request, res: Response) {
         try {
             const cursos = this.cursoRepositorio.buscaCursos();
             return res.status(200).send(cursos);
