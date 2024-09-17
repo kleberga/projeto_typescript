@@ -13,25 +13,25 @@ class CursoService implements CursoServiceInterface {
         this.cursoRepositorio = cursoRepositorio;
     }
 
-    buscaCursosPorId(id: number): CursoSchema | undefined {
-        const curso = this.cursoRepositorio.buscaCursosPorId(id);
+    public async buscaCursosPorId(id: number): Promise<CursoSchema> {
+        const curso = await this.cursoRepositorio.buscaCursosPorId(id);
         if(!curso){
             throw new NotFoundException('Curso não encontrado!');
         }
         return curso;
     }
 
-    public buscarTodos (): CursoSchema[]{
-        return this.cursoRepositorio.buscaCursos();
+    public async buscarTodos (): Promise<CursoSchema[]>{
+        return await this.cursoRepositorio.buscaCursos();
     }
-    public criarCurso (usuario: CursoSchema): void {
-        this.cursoRepositorio.criarCurso(usuario);
+    public async criarCurso (usuario: CursoSchema): Promise<void> {
+        await this.cursoRepositorio.criarCurso(usuario);
     }
-    public atualizar (id:number, usuario: CursoSchema): void {
-        this.cursoRepositorio.atualizarCurso(id, usuario);
+    public async atualizar (id:number, usuario: CursoSchema): Promise<void> {
+        await this.cursoRepositorio.atualizarCurso(id, usuario);
     }
-    public deletar (id:number): void {
-        this.cursoRepositorio.deletarCurso(id);
+    public async deletar (id:number): Promise<void> {
+        await this.cursoRepositorio.deletarCurso(id);
     }
 }
 

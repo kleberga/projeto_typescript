@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import container from './3infra/inversify-config';
-import CursoController from './4api/controllers/cursoController';
+import container from '../3infra/inversify-config';
+import CursoController from './controllers/cursoController';
 
 const routes = Router();
 

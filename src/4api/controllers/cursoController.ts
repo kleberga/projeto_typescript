@@ -1,10 +1,15 @@
 import { body, validationResult, param } from "express-validator";
 import { CriarCursoDTO } from "../../2dominio/dtos/cursoDTO";
-import {Router, Request, Response} from 'express';
+import {Router, Request, Response, NextFunction} from 'express';
 import NotFoundException from "../../2dominio/exceptions/not-found-exception";
 import InternalErrorException from "../../2dominio/exceptions/internal-error-exception";
 import { inject, injectable } from "inversify";
 import CursoRepositorioInterface from "../../2dominio/interfaces/repositorios/curso-interface-repository";
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
 
 @injectable()
 class CursoController {
@@ -17,12 +22,13 @@ class CursoController {
         this.routes();
     }
 
+
     routes () {
         this.router.get('/', this.buscaCursos.bind(this));
         this.router.get('/:id',
             [
                 param('id').isNumeric().withMessage("O campo id deve ser um número")
-            ], this.buscaCursosPorId.bind(this));
+            ], asyncHandler(this.buscaCursosPorId.bind(this)));
         this.router.post('/',
             [
                 body('nome')
@@ -34,7 +40,7 @@ class CursoController {
                 body('duracao_meses')
                 .exists().withMessage('O campo duracao_meses é obrigatório')
                 .custom(value => typeof value === 'number').withMessage("O campo duracao_meses deve ser um número"),
-            ], this.criarCurso.bind(this));
+            ], asyncHandler(this.criarCurso.bind(this)));
         this.router.patch('/:id',
             [
                 param('id')
@@ -45,11 +51,11 @@ class CursoController {
                 .isString().withMessage("O campo descrição deve ser uma string"),
                 body('duracao_meses')
                 .custom(value => typeof value === 'number').withMessage("O campo duracao_meses deve ser um número"),
-            ], this.atualizarCurso.bind(this));
+            ], asyncHandler(this.atualizarCurso.bind(this)));
         this.router.delete('/:id',
             [
-                param('id').isNumeric().withMessage("O campo id deve ser um número!"),
-            ], this.deletarCurso.bind(this));
+                param('id').isNumeric().withMessage("O campo id deve ser um número"),
+            ], asyncHandler(this.deletarCurso.bind(this)));
     }
 
      /**
@@ -86,18 +92,19 @@ class CursoController {
      *                     example: 48
      *       401:
      *         description: Acesso não autorizado
-     *       510:
-     *         description: Erro ao recuperar os cursos! Tente novamente.
+     *       500:
+     *         description: Erro interno ao recuperar os cursos! Tente novamente.
      */
-    buscaCursos (req: Request, res: Response) {
+    async buscaCursos (req: Request, res: Response): Promise<void> {
         try {
-            const cursos = this.cursoRepositorio.buscaCursos();
-            return res.status(200).send(cursos);
+            const cursos = await this.cursoRepositorio.buscaCursos();
+            res.status(200).send(cursos);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            throw new InternalErrorException('Erro ao recuperar os cursos! Tente novamente.')
+            throw new InternalErrorException('Erro interno ao recuperar os cursos! Tente novamente.')
         }
     }
+
 
      /**
      * @swagger
@@ -106,7 +113,7 @@ class CursoController {
      *    description: Operações relacionadas aos cursos de graduação
      * /cursos/{id}:
      *   get:
-     *     summary: Retorna um único curso identificado pelo id
+     *     summary: Retornar um único curso identificado pelo id
      *     tags:
      *       - cursos
      *     parameters:
@@ -143,20 +150,28 @@ class CursoController {
      *       401:
      *         description: Acesso não autorizado
      *       404:
-     *         description: Curso inexistente
+     *         description: Curso inexistente!
+     *       500:
+     *         description: Erro interno ao recuperar o curso! Tente novamente.
      */
-    buscaCursosPorId (req: Request, res: Response) {
+    async buscaCursosPorId (req: Request, res: Response) {
         const errosValidacao = validationResult(req);
         if(!errosValidacao.isEmpty()){
             return res.status(400).send({erros: errosValidacao.array()});
         }
         const id = req.params.id;
-        const curso = this.cursoRepositorio.buscaCursosPorId(+id);
-        if(!curso){
-            throw new NotFoundException('Curso inexistente!')
+        try {
+            const curso = await this.cursoRepositorio.buscaCursosPorId(+id);
+            if(curso == null){
+                throw new NotFoundException('Curso inexistente!')
+            }
+            return res.status(200).send(curso);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error){
+            throw new InternalErrorException('Erro interno ao recuperar o curso! Tente novamente.')
         }
-        return res.status(200).send(curso);
     }
+
 
     /**
      * @swagger
@@ -220,14 +235,14 @@ class CursoController {
      *           type: number
      *           example: 48
      */
-    criarCurso (req: Request, res: Response) {
+    async criarCurso (req: Request, res: Response) {
         const errosValidacao = validationResult(req);
         if(!errosValidacao.isEmpty()){
             return res.status(400).send({erros: errosValidacao.array()});
         }
         const curso: CriarCursoDTO = req.body;
         try {
-            this.cursoRepositorio.criarCurso(curso);
+            await this.cursoRepositorio.criarCurso(curso);
             return res.status(201).send("Curso inserido com sucesso!")
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
@@ -258,7 +273,7 @@ class CursoController {
      *         minimum: 1
      *         description: ID do curso a ser atualizado
      *     responses:
-     *       201:
+     *       200:
      *         description: Curso atualizado com sucesso!
      *       400:
      *         description: Erro (algum campo com formato incorreto)
@@ -306,16 +321,16 @@ class CursoController {
      *           type: number
      *           example: 48
      */
-    atualizarCurso (req: Request, res: Response) {
+    async atualizarCurso (req: Request, res: Response) {
         const errosValidacao = validationResult(req);
         if(!errosValidacao.isEmpty()){
             return res.status(400).send({erros: errosValidacao.array()});
         }
-        const id = req.params.id;
-        const curso = this.cursoRepositorio.buscaCursosPorId(+id);
-        if (curso) {
+        const id = req.params.id.toString();
+        const curso = await this.cursoRepositorio.buscaCursosPorId(+id);
+        if (curso != null) {
             try {
-                this.cursoRepositorio.atualizarCurso(+id, req.body);
+                await this.cursoRepositorio.atualizarCurso(+id, req.body);
                 return res.status(200).send("Curso atualizado com sucesso!")
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch(error) {
@@ -355,17 +370,16 @@ class CursoController {
      *       500:
      *         description: Erro interno ao deletar o curso! Tente novamente.
      */
-    deletarCurso (req: Request, res: Response) {
+    async deletarCurso (req: Request, res: Response) {
         const errosValidacao = validationResult(req);
         if(!errosValidacao.isEmpty()){
             return res.status(400).send({erros: errosValidacao.array()});
         }
         const id = req.params.id;
-        const curso = this.cursoRepositorio.buscaCursosPorId(+id);
-        // console.log(`curso: ${typeof curso != 'undefined'}`);
-        if (typeof curso != 'undefined') {
+        const curso = await this.cursoRepositorio.buscaCursosPorId(+id);
+        if (curso != null) {
             try {
-                this.cursoRepositorio.deletarCurso(+id);
+                await this.cursoRepositorio.deletarCurso(+id);
                 return res.status(200).send("Curso deletado com sucesso!")
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch(error) {

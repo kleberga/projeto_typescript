@@ -1,5 +1,5 @@
 import express from 'express';
-import routes from './routes';
+import routes from './4api/routes';
 import AuthService from './2dominio/servicos/auth-service';
 import ErrorHandler from './3infra/middlewares/error-handler';
 import swaggerJSDoc from 'swagger-jsdoc';

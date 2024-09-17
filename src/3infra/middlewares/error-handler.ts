@@ -6,7 +6,6 @@ class ErrorHandler {
     public handleError (error: Error, req: Request, res: Response, next: NextFunction){
         let status = 500;
         const mensagem = error.message;
-        console.error(`Erro: Status: ${status}; Mensagem: ${mensagem}`);
         if(error instanceof CustomError){
             status = error.statusCode;
             res.status(status).send({

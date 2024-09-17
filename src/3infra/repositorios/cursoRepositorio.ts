@@ -1,29 +1,46 @@
-import path from "path";
-import fs from 'fs';
-import DBSchema from "../dbSchema";
 import CursoSchema from "../cursoSchema";
 import { AtualizarCursoDTO, CriarCursoDTO } from "../../2dominio/dtos/cursoDTO";
 import CursoModel from "../../1entidades/cursos";
 import { injectable } from "inversify";
 import 'reflect-metadata';
 import CursoRepositorioInterface from "../../2dominio/interfaces/repositorios/curso-interface-repository";
+import dotenv from 'dotenv';
+import { Collection, MongoClient, ServerApiVersion } from "mongodb";
+
+dotenv.config({path:'./src/.env'})
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const CHAVEMONGO = process.env.MONGO_DB_KEY;
 
 @injectable()
 class CursoRepositorio implements CursoRepositorioInterface{
-    caminhoArquivo: string;
 
-    constructor(){
-        this.caminhoArquivo = path.join(__dirname, 'DB.json');
+    private readonly CHAVEMONGO = process.env.MONGO_DB_KEY ?? '';
+    private readonly dbName = 'dev';
+    private readonly collectionName = 'cursos';
+
+    private async getCollection(): Promise<{collection: Collection<CursoSchema>, client: MongoClient}>{
+        const client = new MongoClient(this.CHAVEMONGO, {
+            serverApi: {
+              version: ServerApiVersion.v1,
+              strict: true,
+              deprecationErrors: true,
+            }
+          });
+        await client.connect();
+        const db = client.db(this.dbName);
+        const collection = db.collection<CursoSchema>(this.collectionName);
+        return {collection, client}
     }
 
-    acessoDB(): DBSchema {
-        const bdPuro = fs.readFileSync(this.caminhoArquivo, 'utf-8');
-        return JSON.parse(bdPuro);
-    }
-
-    buscaCursos(){
-        const bd = this.acessoDB();
-        return bd.cursos;
+    public async buscaCursos(): Promise<CursoSchema[]>{
+        const { collection, client } = await this.getCollection();
+        try{
+            const cursos = await collection.find({}).toArray();
+            return cursos;
+        }  finally {
+            client.close();
+        }
     }
 
     /**
@@ -32,57 +49,56 @@ class CursoRepositorio implements CursoRepositorioInterface{
      * @returns {CursoSchema}
      * @example {id: 1, nome: "Ciência da Computação", ...}
      */
-    buscaCursosPorId(id: number): CursoSchema | undefined {
-        const bd = this.acessoDB();
-        const curso = bd.cursos.find((curso) => curso.id === id);
-        return curso;
+    public async buscaCursosPorId(id: number): Promise<CursoSchema | null> {
+        const { collection, client } = await this.getCollection();
+        try{
+            const cursos = await collection.findOne({id: id});
+            return cursos;
+        } finally {
+            client.close();
+        }
     }
- 
-    reescreverCursoArquivo(curso: Array<CursoSchema>): boolean {
-        const bd = this.acessoDB();
-        bd.cursos = curso;
+
+    public async criarCurso (curso: CriarCursoDTO): Promise<void> {
+        const { collection, client } = await this.getCollection();
+        try{
+            const cursoMaiorId = await collection.find({}).sort({id:-1}).limit(1).toArray();
+            const novoCurso = new CursoModel(
+                cursoMaiorId[0].id + 1,
+                curso.nome,
+                curso.descricao,
+                curso.duracao_meses
+    
+            );
+            await collection.insertOne(novoCurso);
+        } finally {
+            await client.close()
+        }
+    }
+
+    public async atualizarCurso (id: number, curso: AtualizarCursoDTO): Promise<void> {
+        const { collection, client } = await this.getCollection();
         try {
-            fs.writeFileSync(this.caminhoArquivo, JSON.stringify(bd));
-            return true;
-        } catch {
-            return false
+            const atualizacao = {
+                $set: {
+                    ...(curso.nome && {nome: curso.nome}),
+                    ...(curso.descricao !== undefined && {descricao: curso.descricao}),
+                    ...(curso.duracao_meses !== undefined && {duracao_meses: curso.duracao_meses}),
+                }
+            };
+            await collection.updateOne({id: id}, atualizacao)
+        } finally {
+            await client.close()
         }
     }
 
-    criarCurso (curso: CriarCursoDTO) {
-        const cursos = this.buscaCursos();
-        const maiorId = cursos.reduce(
-            (max, curso) => curso.id > max.id ? curso : max, cursos[0]
-        );
-        const novoCurso = new CursoModel(
-            maiorId.id + 1,
-            curso.nome,
-            curso.descricao,
-            curso.duracao_meses
-
-        );
-        cursos.push(novoCurso);
-        this.reescreverCursoArquivo(cursos);
-    }
-
-    atualizarCurso (id: number, curso: AtualizarCursoDTO) {
-        const cursos = this.buscaCursos();
-        const posicaoCurso = cursos.findIndex(curso => curso.id === id);
-        if( posicaoCurso !== -1){
-            if(curso.nome) cursos[posicaoCurso].nome = curso.nome;
-            if(curso.descricao) cursos[posicaoCurso].descricao = curso.descricao;
-            if(curso.duracao_meses) cursos[posicaoCurso].duracao_meses = curso.duracao_meses;
+    public async deletarCurso (id: number): Promise<void> {
+        const { collection, client } = await this.getCollection();
+        try {
+            await collection.deleteOne({id: id});
+        } finally {
+            await client.close()
         }
-        this.reescreverCursoArquivo(cursos);
-    }
-
-    deletarCurso (id: number) {
-        const cursos = this.buscaCursos();
-        const posicaoCurso = cursos.findIndex(curso => curso.id === id);
-        if( posicaoCurso !== -1){
-            cursos.splice(posicaoCurso, 1);
-        }
-        this.reescreverCursoArquivo(cursos);
     }
 }
 
