@@ -1,27 +1,21 @@
 import { body, validationResult, param } from "express-validator";
 import { CriarCursoDTO } from "../../2dominio/dtos/cursoDTO";
-import {Router, Request, Response, NextFunction} from 'express';
-import NotFoundException from "../../2dominio/exceptions/not-found-exception";
-import InternalErrorException from "../../2dominio/exceptions/internal-error-exception";
+import {Router, Request, Response} from 'express';
 import { inject, injectable } from "inversify";
-import CursoRepositorioInterface from "../../2dominio/interfaces/repositorios/curso-interface-repository";
+import asyncHandler from "../utils/async-handler";
+import CursoServiceInterface from "../../2dominio/interfaces/services/curso-service-interface";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
 
 @injectable()
 class CursoController {
 
-    private readonly cursoRepositorio: CursoRepositorioInterface;
+    private readonly cursoService: CursoServiceInterface;
     public readonly router: Router = Router();
 
-    constructor (@inject('CursoRepositorio') cursoRepositorio: CursoRepositorioInterface){
-        this.cursoRepositorio = cursoRepositorio;
+    constructor (@inject('CursoService') cursoService: CursoServiceInterface){
+        this.cursoService = cursoService;
         this.routes();
     }
-
 
     routes () {
         this.router.get('/', this.buscaCursos.bind(this));
@@ -96,13 +90,8 @@ class CursoController {
      *         description: Erro interno ao recuperar os cursos! Tente novamente.
      */
     async buscaCursos (req: Request, res: Response): Promise<void> {
-        try {
-            const cursos = await this.cursoRepositorio.buscaCursos();
-            res.status(200).send(cursos);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error) {
-            throw new InternalErrorException('Erro interno ao recuperar os cursos! Tente novamente.')
-        }
+        const cursos = await this.cursoService.buscarTodos();
+        res.status(200).send(cursos);
     }
 
 
@@ -160,18 +149,9 @@ class CursoController {
             return res.status(400).send({erros: errosValidacao.array()});
         }
         const id = req.params.id;
-        try {
-            const curso = await this.cursoRepositorio.buscaCursosPorId(+id);
-            if(curso == null){
-                throw new NotFoundException('Curso inexistente!')
-            }
-            return res.status(200).send(curso);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error){
-            throw new InternalErrorException('Erro interno ao recuperar o curso! Tente novamente.')
-        }
+        const curso = await this.cursoService.buscaCursosPorId(+id);
+        return res.status(200).send(curso);
     }
-
 
     /**
      * @swagger
@@ -241,13 +221,8 @@ class CursoController {
             return res.status(400).send({erros: errosValidacao.array()});
         }
         const curso: CriarCursoDTO = req.body;
-        try {
-            await this.cursoRepositorio.criarCurso(curso);
-            return res.status(201).send("Curso inserido com sucesso!")
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error) {
-            throw new InternalErrorException('Erro interno ao criar o curso! Tente novamente.')
-        }
+        await this.cursoService.criarCurso(curso);
+        return res.status(201).send("Curso inserido com sucesso!");
     }
 
     /**
@@ -327,18 +302,8 @@ class CursoController {
             return res.status(400).send({erros: errosValidacao.array()});
         }
         const id = req.params.id.toString();
-        const curso = await this.cursoRepositorio.buscaCursosPorId(+id);
-        if (curso != null) {
-            try {
-                await this.cursoRepositorio.atualizarCurso(+id, req.body);
-                return res.status(200).send("Curso atualizado com sucesso!")
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            } catch(error) {
-                throw new InternalErrorException('Erro interno ao atualizar o curso! Tente novamente.')
-            }
-        } else {
-            throw new NotFoundException('Curso inexistente!')
-        }
+        await this.cursoService.atualizar(+id, req.body);
+        return res.status(200).send("Curso atualizado com sucesso!")
     }
 
     /**
@@ -376,18 +341,8 @@ class CursoController {
             return res.status(400).send({erros: errosValidacao.array()});
         }
         const id = req.params.id;
-        const curso = await this.cursoRepositorio.buscaCursosPorId(+id);
-        if (curso != null) {
-            try {
-                await this.cursoRepositorio.deletarCurso(+id);
-                return res.status(200).send("Curso deletado com sucesso!")
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            } catch(error) {
-                throw new InternalErrorException('Erro interno ao deletar o curso! Tente novamente.')
-            }
-        } else {
-            throw new NotFoundException('Curso inexistente!')
-        }
+        await this.cursoService.deletar(+id);
+        return res.status(200).send("Curso deletado com sucesso!");
     }
 }
 

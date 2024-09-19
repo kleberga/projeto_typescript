@@ -1,4 +1,7 @@
+import { ObjectId } from "mongodb";
+
 type CursoSchema = {
+    _id?: ObjectId;
     id: number,
     nome: string,
     descricao: string,

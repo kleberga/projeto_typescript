@@ -1,9 +1,8 @@
-import CursoSchema from '../infra/cursoSchema';
-import CursoRepositorio from '../infra/cursoRepositorio';
-import CursoService from '../curso-service';
+import CursoRepositorio from '../3infra/repositorios/cursoRepositorio';
+import CursoService from '../2dominio/servicos/curso-service';
+import CursoModel from '../1entidades/cursos';
 
-
-jest.mock('../infra/cursoRepositorio')
+jest.mock('../3infra/repositorios/cursoRepositorio')
 
 describe('CursoService', () => {
 
@@ -13,32 +12,29 @@ describe('CursoService', () => {
     beforeEach(() => {
         cursoRepositorio = new CursoRepositorio() as jest.Mocked<CursoRepositorio>;
         cursoService = new CursoService(cursoRepositorio);
-    })
+    });
 
     afterAll(() => {
         jest.clearAllMocks();
-    })
-
-
+    });
 
     describe('buscarPorId', () => {
-        it('Deve retornar o curso correspondente ao id fornecido', () => {
-            const mockCurso: CursoSchema = {id: 1, nome: "Ciência da Computação", descricao: "Curso de teste", duracao_meses: 48};
-
-            //const cursoRepositorio = new CursoRepositorio() as jest.Mocked<CursoRepositorio>;
-
-            cursoRepositorio.buscaCursosPorId.mockReturnValue(mockCurso);
-
-            const curso = cursoService.buscarId(1);
-
+        it('Deve retornar o curso correspondente ao id fornecido', async () => {
+            const mockCurso: CursoModel = {
+                id: 1, 
+                nome: "Engenharia de software", 
+                descricao: "O aprendizado em Engenharia de Software aborda uma visão aprofundada do processo de desenvolvimento de software, incluindo Inteligência Artificial, softwares escaláveis, microsserviços, Cloud, métodos ágeis e gestão do próprio processo de engenharia de software.", 
+                duracao_meses: 48
+            };
+            cursoRepositorio.buscaCursosPorId.mockResolvedValue(mockCurso);
+            const curso = await cursoService.buscaCursosPorId(1);
             expect(cursoRepositorio.buscaCursosPorId).toHaveBeenCalledWith(1);
             expect(curso).toEqual(mockCurso);
-        })
-    })
-
-    it("Deve retornar um erro se o curso não for encontrado", () => {
-        cursoRepositorio.buscaCursosPorId.mockReturnValue(undefined);
-        expect(() => cursoService.buscarId(999)).toThrow('Curso não encontrado');
-        expect(cursoRepositorio.buscaCursosPorId).toHaveBeenNthCalledWith(999);
-    })
-})
+        });
+        it("Deve retornar um erro se o curso não for encontrado", async () => {
+            cursoRepositorio.buscaCursosPorId.mockResolvedValue(undefined);
+            await expect(() => cursoService.buscaCursosPorId(999)).rejects.toThrow('Curso inexistente!');
+            expect(cursoRepositorio.buscaCursosPorId).toHaveBeenCalledWith(999);
+        });
+    });
+});

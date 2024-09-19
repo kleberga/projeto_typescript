@@ -1,8 +1,9 @@
-import NotFoundException from "../exceptions/not-found-exception";
-import CursoSchema from "../../3infra/cursoSchema";
+
 import CursoRepositorioInterface from "../interfaces/repositorios/curso-interface-repository";
 import { inject, injectable } from "inversify";
 import CursoServiceInterface from "../interfaces/services/curso-service-interface";
+import CursoModel from "../../1entidades/cursos";
+import NotFoundException from "../exceptions/not-found-exception";
 
 @injectable()
 class CursoService implements CursoServiceInterface {
@@ -13,24 +14,35 @@ class CursoService implements CursoServiceInterface {
         this.cursoRepositorio = cursoRepositorio;
     }
 
-    public async buscaCursosPorId(id: number): Promise<CursoSchema> {
+    public async buscaCursosPorId(id: number): Promise<CursoModel | undefined> {
         const curso = await this.cursoRepositorio.buscaCursosPorId(id);
-        if(!curso){
-            throw new NotFoundException('Curso não encontrado!');
+        if(typeof curso == 'undefined'){
+            throw new NotFoundException('Curso inexistente!')
         }
         return curso;
     }
 
-    public async buscarTodos (): Promise<CursoSchema[]>{
+    public async buscarTodos (): Promise<(CursoModel | undefined)[]>{
         return await this.cursoRepositorio.buscaCursos();
     }
-    public async criarCurso (usuario: CursoSchema): Promise<void> {
+
+    public async criarCurso (usuario: CursoModel): Promise<void> {
         await this.cursoRepositorio.criarCurso(usuario);
     }
-    public async atualizar (id:number, usuario: CursoSchema): Promise<void> {
+
+    public async atualizar (id:number, usuario: CursoModel): Promise<void> {
+        const curso = await this.cursoRepositorio.buscaCursosPorId(+id);
+        if (typeof curso == 'undefined') {
+            throw new NotFoundException('Curso inexistente!')
+        }
         await this.cursoRepositorio.atualizarCurso(id, usuario);
     }
+
     public async deletar (id:number): Promise<void> {
+        const curso = await this.cursoRepositorio.buscaCursosPorId(+id);
+        if (typeof curso == 'undefined') {
+            throw new NotFoundException('Curso inexistente!')
+        } 
         await this.cursoRepositorio.deletarCurso(id);
     }
 }

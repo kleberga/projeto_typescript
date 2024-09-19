@@ -1,4 +1,5 @@
 export class CursoModel {
+    _id?: string;
     id: number;
     nome: string;
     descricao: string;
@@ -8,8 +9,10 @@ export class CursoModel {
         id: number,
         nome: string,
         descricao: string,
-        duracao_meses: number
+        duracao_meses: number,
+        _id?: string,
     ) {
+        this._id = _id;
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
