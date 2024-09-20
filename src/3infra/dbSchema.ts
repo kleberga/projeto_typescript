@@ -1,7 +1,8 @@
-import CursoSchema from "./cursoSchema";
+import { CursoSchemaDriver } from "./cursoSchema";
+
 
 interface DBSchema{
-    cursos: CursoSchema[];
+    cursos: CursoSchemaDriver[];
 }
 
 export default DBSchema;

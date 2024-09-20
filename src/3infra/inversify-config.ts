@@ -1,5 +1,5 @@
 import { Container } from "inversify";
-import CursoRepositorio from "./repositorios/cursoRepositorio";
+import CursoRepositorio from "./repositorios/cursoRepositorio-mongoose";
 import CursoController from "../4api/controllers/cursoController";
 import CursoRepositorioInterface from "../2dominio/interfaces/repositorios/curso-interface-repository";
 import 'reflect-metadata';

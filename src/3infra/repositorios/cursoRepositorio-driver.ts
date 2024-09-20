@@ -1,4 +1,3 @@
-import CursoSchema from "../cursoSchema";
 import { AtualizarCursoDTO, CriarCursoDTO } from "../../2dominio/dtos/cursoDTO";
 import { injectable } from "inversify";
 import 'reflect-metadata';
@@ -8,6 +7,7 @@ import { Collection, MongoClient, ObjectId, ServerApiVersion, WithId } from "mon
 import CursoModel from "../../1entidades/cursos";
 import InternalErrorException from "../../2dominio/exceptions/internal-error-exception";
 import { NextFunction } from "express";
+import { CursoSchemaDriver } from "../cursoSchema";
 
 dotenv.config({path:'./src/.env'})
 
@@ -22,7 +22,7 @@ class CursoRepositorio implements CursoRepositorioInterface{
     private readonly collectionName: string = 'cursos';
     private next: NextFunction | undefined;
 
-    private async getCollection(): Promise<{collection: Collection<CursoSchema>, client: MongoClient}>{
+    private async getCollection(): Promise<{collection: Collection<CursoSchemaDriver>, client: MongoClient}>{
         const client = new MongoClient(this.CHAVEMONGO, {
             serverApi: {
               version: ServerApiVersion.v1,
@@ -32,7 +32,7 @@ class CursoRepositorio implements CursoRepositorioInterface{
           });
         await client.connect();
         const db = client.db(this.dbName);
-        const collection = db.collection<CursoSchema>(this.collectionName);
+        const collection = db.collection<CursoSchemaDriver>(this.collectionName);
         return {collection, client}
     }
 
@@ -52,7 +52,7 @@ class CursoRepositorio implements CursoRepositorioInterface{
     /**
      * Este método busca um curso pelo id.
      * @param id 
-     * @returns {CursoSchema}
+     * @returns {CursoSchemaDriver}
      * @example {id: 1, nome: "Ciência da Computação", ...}
      */
     public async buscaCursosPorId(id: number): Promise<CursoModel | undefined> {
@@ -72,7 +72,7 @@ class CursoRepositorio implements CursoRepositorioInterface{
         const { collection, client } = await this.getCollection();
         try{
             const cursoMaiorId = await collection.find({}).sort({id:-1}).limit(1).toArray();
-            const novoCurso: CursoSchema = {
+            const novoCurso: CursoSchemaDriver = {
                 _id: new ObjectId(),
                 id: cursoMaiorId[0].id + 1,
                 nome: curso.nome,
@@ -119,7 +119,7 @@ class CursoRepositorio implements CursoRepositorioInterface{
         }
     }
 
-    private schemaParser(cursoSchema: WithId<CursoSchema> | null): CursoModel | undefined {
+    private schemaParser(cursoSchema: WithId<CursoSchemaDriver> | null): CursoModel | undefined {
         if(cursoSchema){
             const curso = new CursoModel(
                 cursoSchema?.id ?? 0,

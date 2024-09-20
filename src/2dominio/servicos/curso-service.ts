@@ -30,12 +30,12 @@ class CursoService implements CursoServiceInterface {
         await this.cursoRepositorio.criarCurso(usuario);
     }
 
-    public async atualizar (id:number, usuario: CursoModel): Promise<void> {
+    public async atualizar (id:number, cursoAtual: CursoModel): Promise<void> {
         const curso = await this.cursoRepositorio.buscaCursosPorId(+id);
         if (typeof curso == 'undefined') {
             throw new NotFoundException('Curso inexistente!')
         }
-        await this.cursoRepositorio.atualizarCurso(id, usuario);
+        await this.cursoRepositorio.atualizarCurso(id, cursoAtual);
     }
 
     public async deletar (id:number): Promise<void> {
