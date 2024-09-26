@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import mongoose, { Schema } from "mongoose";
-import CursoModel from "../1entidades/cursos";
+import CursoModel from "../../../1entidades/cursos";
+import { CoordenadorSchema } from "./coordenadorSchema";
 
 export type CursoSchemaDriver = {
     _id?: ObjectId;
@@ -10,11 +11,12 @@ export type CursoSchemaDriver = {
     duracao_meses: number
 }
 
-const CursoSchema: Schema = new Schema({
+export const CursoSchema: Schema = new Schema({
     id: {type: Number, require: true, unique: true},
     nome: {type: String, required: true},
     descricao: {type: String, required: true},
-    duracao_meses: {type: String, required: true}
+    duracao_meses: {type: String, required: true},
+    coordenador: CoordenadorSchema
 },{
     versionKey: false
 });

@@ -1,4 +1,4 @@
-import { CursoSchemaDriver } from "./cursoSchema";
+import { CursoSchemaDriver } from "./schemas/cursoSchema";
 
 
 interface DBSchema{

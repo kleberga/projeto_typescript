@@ -7,10 +7,12 @@ import swaggerUI from 'swagger-ui-express';
 import Logger from './3infra/middlewares/logger';
 import swaggerConfig from './3infra/swagger-options';
 import rotaNaoEncontradaMiddleware from './3infra/middlewares/rota-nao-encontrada';
+import { connectDatabase } from './3infra/database/mongoose.config';
 
 const app = express();
 const port = 3000;
 const swaggerOptions = swaggerJSDoc(swaggerConfig);
+connectDatabase();
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerOptions));
 // utilizar json para receber e passar os dados
 app.use(express.json());

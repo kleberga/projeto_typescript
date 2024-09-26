@@ -5,8 +5,12 @@ import CursoRepositorioInterface from "../2dominio/interfaces/repositorios/curso
 import 'reflect-metadata';
 import CursoServiceInterface from "../2dominio/interfaces/services/curso-service-interface";
 import CursoService from "../2dominio/servicos/curso-service";
+import DBModels from "./database/dbSchema";
 
 const container = new Container();
+container
+    .bind<DBModels>('DBModels')
+    .to(DBModels).inRequestScope();
 container
     .bind<CursoRepositorioInterface>('CursoRepositorio')
     .to(CursoRepositorio).inRequestScope();

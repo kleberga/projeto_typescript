@@ -7,7 +7,7 @@ import { Collection, MongoClient, ObjectId, ServerApiVersion, WithId } from "mon
 import CursoModel from "../../1entidades/cursos";
 import InternalErrorException from "../../2dominio/exceptions/internal-error-exception";
 import { NextFunction } from "express";
-import { CursoSchemaDriver } from "../cursoSchema";
+import { CursoSchemaDriver } from "../database/schemas/cursoSchema";
 
 dotenv.config({path:'./src/.env'})
 
