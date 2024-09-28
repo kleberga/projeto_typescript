@@ -8,6 +8,8 @@ import CursoModel from "../../1entidades/cursos";
 import InternalErrorException from "../../2dominio/exceptions/internal-error-exception";
 import { NextFunction } from "express";
 import { CursoSchemaDriver } from "../database/schemas/cursoSchema";
+import CoordenadorVO from "../../1entidades/vo/coordenadorVO";
+import CampusModel from "../../1entidades/campus";
 
 dotenv.config({path:'./src/.env'})
 
@@ -126,7 +128,8 @@ class CursoRepositorio implements CursoRepositorioInterface{
                 cursoSchema?.nome ?? '',
                 cursoSchema?.descricao ?? '',
                 cursoSchema?.duracao_meses ?? '',
-                cursoSchema?._id?.toString() ?? ''
+                {} as CoordenadorVO,
+                {} as CampusModel[]
             );
             return curso;
         }

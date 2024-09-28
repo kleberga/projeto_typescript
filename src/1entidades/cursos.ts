@@ -1,3 +1,4 @@
+import CampusModel from "./campus";
 import CoordenadorVO from "./vo/coordenadorVO";
 
 export class CursoModel {
@@ -7,6 +8,7 @@ export class CursoModel {
     descricao: string;
     duracao_meses: number;
     coordenador: CoordenadorVO;
+    campus: CampusModel[] = [];
 
     constructor(
         id: number,
@@ -14,6 +16,7 @@ export class CursoModel {
         descricao: string,
         duracao_meses: number,
         coordenador: CoordenadorVO,
+        campus?: CampusModel[],
         _id?: string,
     ) {
         this._id = _id;
@@ -22,6 +25,9 @@ export class CursoModel {
         this.descricao = descricao;
         this.duracao_meses = duracao_meses;
         this.coordenador = coordenador;
+        if(campus){
+            this.campus.push(...campus);
+        }
     }
 }
 

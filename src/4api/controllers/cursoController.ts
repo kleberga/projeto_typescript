@@ -34,6 +34,9 @@ class CursoController {
                 body('duracao_meses')
                 .exists().withMessage('O campo duracao_meses é obrigatório')
                 .custom(value => typeof value === 'number').withMessage("O campo duracao_meses deve ser um número"),
+                body('coordenador')
+                .exists().withMessage('O campo coordenador é obrigatório')
+                .custom(value => typeof value === 'object').withMessage("O campo coordenador deve ser um objeto contendo nome e telefone")
             ], asyncHandler(this.criarCurso.bind(this)));
         this.router.patch('/:id',
             [
@@ -45,6 +48,8 @@ class CursoController {
                 .isString().withMessage("O campo descrição deve ser uma string"),
                 body('duracao_meses')
                 .custom(value => typeof value === 'number').withMessage("O campo duracao_meses deve ser um número"),
+                body('coordenador')
+                .custom(value => typeof value === 'object').withMessage("O campo coordenador deve ser um objeto contendo nome e telefone")
             ], asyncHandler(this.atualizarCurso.bind(this)));
         this.router.delete('/:id',
             [

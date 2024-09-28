@@ -3,15 +3,19 @@ const swaggerConfig: SwaggerOptions = {
  definition: {
    openapi: '3.0.0',
    info: {
-     title: 'API de Cursos de Graduação',
+     title: 'API de Cursos de Graduação e Campus da Faculdade',
      version: '1.0.0',
-     description: 'Documentação da API de Cursos de Graduação' ,
+     description: 'Documentação da API de Cursos de Graduação e Campus da Faculdade' ,
    },
    tags: [
      {
        name: 'cursos',
        description: 'Operações relacionadas aos cursos de graduação' ,
      },
+     {
+      name: 'campus',
+      description: 'Operações relacionadas aos campus da faculdade' ,
+    },
    ],
    servers: [
        {

@@ -26,8 +26,8 @@ class CursoService implements CursoServiceInterface {
         return await this.cursoRepositorio.buscaCursos();
     }
 
-    public async criarCurso (usuario: CursoModel): Promise<void> {
-        await this.cursoRepositorio.criarCurso(usuario);
+    public async criarCurso (curso: CursoModel): Promise<void> {
+        await this.cursoRepositorio.criarCurso(curso);
     }
 
     public async atualizar (id:number, cursoAtual: CursoModel): Promise<void> {
