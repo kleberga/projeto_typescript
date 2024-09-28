@@ -10,7 +10,7 @@ Este aplicativo consiste em um back-end para consultar dados de cursos de gradua
 Do ponto de vista técnico, o aplicativo possui as seguintes características:
 - a arquitetura é formada por camadas: entidades, domínio, infra e api;
 - foi desenvolvido usando as bibliotecas Express e Typescript;
-- os dados dos cursos e dos campus são armazenados no banco de dados MongoDB, utilizando O Object Document Mapping (ODM) Mongoose;
+- os dados dos cursos e dos campus são armazenados no banco de dados MongoDB, utilizando o Object Document Mapping (ODM) Mongoose;
 - o cursos são adicionados aos campus por meio de referência indireta;
 - existe inversão de dependência, ao se utilizar interfaces;
 - existe injeção de dependência, de modo que os métodos não ficam vinculado diretamente às classes;
