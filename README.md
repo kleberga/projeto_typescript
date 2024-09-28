@@ -12,8 +12,8 @@ Do ponto de vista técnico, o aplicativo possui as seguintes características:
 - foi desenvolvido usando as bibliotecas Express e Typescript;
 - os dados dos cursos e dos campus são armazenados no banco de dados MongoDB, utilizando o Object Document Mapping (ODM) Mongoose;
 - o cursos são adicionados aos campus por meio de referência indireta;
-- existe inversão de dependência, ao se utilizar interfaces;
-- existe injeção de dependência, de modo que os métodos não ficam vinculado diretamente às classes;
+- existe inversão de dependência com a utilização de interfaces;
+- existe injeção de dependência, de modo que os métodos não ficam vinculados diretamente às classes;
 - todas as rotas estão protegidas por uma chave de acesso;
 - a documentação das rotas foi criada utilizando a biblioteca Swagger; e
 - há tratamento personalizado dos erros que possam ocorrer ao acessar as rotas.
