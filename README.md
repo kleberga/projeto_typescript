@@ -1,4 +1,4 @@
-# Back-end de cursos de graduação
+# Back-end de cursos de graduação e campus de uma faculdade
 
 Este aplicativo consiste em um back-end para consultar dados de cursos de graduação e de campus de uma faculdade via API. O aplicativo possui as seguintes características:
 - existem rotas para consultar todos os cursos, consultar um único curso pelo ID dele, incluir, atualizar e deletar cursos;
